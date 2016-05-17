@@ -2,12 +2,12 @@ package pong.environment;
 
 import pong.types.Coordinate;
 
-public class Bound {
+public class Dimension {
 	
 	public int width;
 	public int height;
 	
-	public Bound(int width, int height) {
+	public Dimension(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}

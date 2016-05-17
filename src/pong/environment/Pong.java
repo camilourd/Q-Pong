@@ -10,20 +10,24 @@ public class Pong {
 	public static final int PLAYER = 0;
 	public static final int OPPONENT = 1;
 	
-	protected Bound bound;
+	protected Dimension dimension;
 	protected Agent[] players = new Agent[2];
 	protected Coordinate[] status = new Coordinate[2];
 	protected Ball ball;
 	
-	public Pong(Bound bound, Agent player, Agent opponent) {
-		player.setSize(bound.height / 4);
-		opponent.setSize(bound.height / 4);
-		this.bound = bound;
+	public Pong(Dimension dimension, Agent player, Agent opponent) {
+		player.setSize(dimension.height / 4);
+		opponent.setSize(dimension.height / 4);
+		player.setStatus(PLAYER);
+		opponent.setStatus(OPPONENT);
+		player.setBound(dimension);
+		opponent.setBound(dimension);
+		this.dimension = dimension;
 		this.players[PLAYER] = player;
 		this.players[OPPONENT] = opponent;
-		this.status[PLAYER] = new Coordinate(2, bound.height / 2);
-		this.status[OPPONENT] = new Coordinate(bound.width - 2, bound.height / 2);
-		this.ball = new Ball(new Coordinate(2, utils.rand(bound.height)), new Coordinate(1 + utils.rand(2), 1 + utils.rand(2)));
+		this.status[PLAYER] = new Coordinate(2, dimension.height / 2);
+		this.status[OPPONENT] = new Coordinate(dimension.width - 2, dimension.height / 2);
+		this.ball = new Ball(dimension.center(), new Coordinate(1 + utils.rand(2), 1 + utils.rand(2)));
 	}
 	
 	public Percept sense() {
@@ -51,7 +55,7 @@ public class Pong {
 	}
 
 	public boolean isValidPosition(int player, int y) {
-		return (y >= (players[player].getSize() / 2)) && (y <= bound.height - (players[player].getSize() / 2));
+		return (y >= (players[player].getSize() / 2)) && (y <= dimension.height - (players[player].getSize() / 2));
 	}
 
 }
