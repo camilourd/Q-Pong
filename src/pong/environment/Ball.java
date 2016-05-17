@@ -4,8 +4,8 @@ import pong.types.Coordinate;
 
 public class Ball {
 	
-	protected Coordinate location;
-	protected Coordinate direction;
+	public Coordinate location;
+	public Coordinate direction;
 	
 	public Ball(Coordinate location, Coordinate direction) {
 		this.location = location;

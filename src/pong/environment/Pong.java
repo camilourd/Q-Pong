@@ -27,9 +27,15 @@ public class Pong {
 		this.players[OPPONENT] = opponent;
 		this.status[PLAYER] = new Coordinate(2, dimension.height / 2);
 		this.status[OPPONENT] = new Coordinate(dimension.width - 2, dimension.height / 2);
-		this.ball = new Ball(dimension.center(), new Coordinate(1 + utils.rand(2), 1 + utils.rand(2)));
+		init();
 	}
 	
+	public void init() {
+		players[PLAYER].init();
+		players[OPPONENT].init();
+		ball = new Ball(dimension.center(), new Coordinate(1 + utils.rand(2), 1 + utils.rand(2)));
+	}
+
 	public Percept sense() {
 		return new Percept(status[PLAYER].y, status[OPPONENT].x, ball);
 	}
