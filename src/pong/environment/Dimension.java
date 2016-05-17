@@ -15,5 +15,9 @@ public class Dimension {
 	public Coordinate center() {
 		return new Coordinate(width / 2, height / 2);
 	}
+	
+	public boolean isInside(Coordinate coord) {
+		return (coord.x >= 0 && coord.x < width) && (coord.y >= 0 && coord.y < height);
+	}
 
 }

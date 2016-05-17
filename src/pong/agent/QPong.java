@@ -6,10 +6,8 @@ import java.util.List;
 import pong.environment.Pong;
 
 public class QPong extends Agent {
-
-	private final double gamma;
 	
-	private double[][][][][][] V;
+	private int[][][][][][] V;
     private int[][][][][][] P;
     
     private final int[] deltaX = {-2, -1, 1, 2};
@@ -18,17 +16,13 @@ public class QPong extends Agent {
     
     private int[][][][] borderBallY;
     
-    private double[][][][][][][] nextQ;
-    private double[][][][][][] nextV;
+    private int[][][][][][][] nextQ;
+    private int[][][][][][] nextV;
     private int[][][][][][] nextP;
-	
-	public QPong(double gamma) {
-		this.gamma = gamma;
-	}
-	
+		
 	@Override
 	public void init() {
-		borderBallY = new int[dimension.width][dimension.height][deltaX.length][deltaY.length];
+		borderBallY = new int[dimension.width][dimension.height][deltaX.length + 2][deltaY.length + 1];
 		int[] DX = {-2, -1};
         int[] DY = {-1, +1};
         
@@ -64,20 +58,21 @@ public class QPong extends Agent {
                         ballX = pathBallX.get(i);
                         ballY = pathBallY.get(i);
                         dy = pathDeltaY.get(i);
-                        borderBallY[ballX][ballY][dx][dy] = borderY;
+                        borderBallY[ballX][ballY][dx + 2][dy + 1] = borderY;
                     }
                 }
             }
         }
+        learn();
 	}
 	
 	public void learn() {
         
         int playerRange = dimension.height-size+1;
         
-        nextQ = new double[playerRange][playerRange][dimension.width][dimension.height][deltaX.length][deltaY.length][deltaY.length];
-        nextV = new double[playerRange][playerRange][dimension.width][dimension.height][deltaX.length][deltaY.length];
-        nextP = new int[playerRange][playerRange][dimension.width][dimension.height][deltaX.length][deltaY.length];
+        nextQ = new int[playerRange][playerRange][dimension.width][dimension.height][deltaX.length + 2][deltaY.length + 1][deltaY.length + 1];
+        nextV = new int[playerRange][playerRange][dimension.width][dimension.height][deltaX.length + 2][deltaY.length + 1];
+        nextP = new int[playerRange][playerRange][dimension.width][dimension.height][deltaX.length + 2][deltaY.length + 1];
         
         for (int playerY = 0; playerY < playerRange; playerY++)
             for (int opponentY = 0; opponentY < playerRange; opponentY++)
@@ -94,27 +89,27 @@ public class QPong extends Agent {
         ballX = moveBallX(ballX, dx);
         ballY = moveBallY(ballY, dy);
         
-        double maxi = -1;
+        int maxi = -1;
         int action = 0;
         for (int pAct : actions) {
             int nextPlayerY = movePlayer(playerY, pAct);
-            double r = reward(nextPlayerY, opponentY, ballX, ballY, dx, dy);
-            double v = V[nextPlayerY][opponentY][ballX][ballY][dx][dy];
+            int r = reward(nextPlayerY, opponentY, ballX, ballY, dx, dy);
+            int v = V[nextPlayerY][opponentY][ballX][ballY][dx + 2][dy + 1];
 
-            nextQ[playerY][opponentY][ballX][ballX][dx][dy][pAct] = r+gamma*v;
+            nextQ[playerY][opponentY][ballX][ballX][dx + 2][dy + 1][pAct + 1] = r +v;
             
-            if (maxi < r+gamma*v) {
-                maxi = r+gamma*v;
+            if (maxi < r + v) {
+                maxi = r + v;
                 action = pAct;
             }
         }
-        nextV[playerY][opponentY][ballX][ballY][dx][dy] = maxi;
-        nextP[playerY][opponentY][ballX][ballY][dx][dy] = action;
+        nextV[playerY][opponentY][ballX][ballY][dx + 2][dy + 1] = maxi;
+        nextP[playerY][opponentY][ballX][ballY][dx + 2][dy + 1] = action;
     }
 	
 	private int reward(int playerY, int opponentY, int ballX, int ballY, int dx, int dy) {
         
-        int targetY = borderBallY[ballX][ballY][dx][dy];
+        int targetY = borderBallY[ballX][ballY][dx + 2][dy + 1];
         int playerDistance = targetDistance(playerY, targetY);
         
             // ball above the player
@@ -139,7 +134,7 @@ public class QPong extends Agent {
                 dx = -2;
             }
             
-            targetY = borderBallY[dimension.height-2][ballY][dx][dy];
+            targetY = borderBallY[dimension.height-2][ballY][dx + 2][dy + 1];
             int opponentDistance = targetDistance(opponentY, targetY);
             
             return opponentDistance;
@@ -204,7 +199,7 @@ public class QPong extends Agent {
             playerY = percept.opponent;
             opponentY = tmp;
         }
-        return P[playerY][opponentY][ballX][ballY][ballDeltaX][ballDeltaY];
+        return P[playerY][opponentY][ballX][ballY][ballDeltaX + 2][ballDeltaY + 1];
 	}
 
 }
