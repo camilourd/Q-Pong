@@ -10,14 +10,18 @@ public class QPong extends Agent {
     private final int[] deltaY = {-1, 1};
     private final int[] actions = {0, -1, 1};
     
-    private double[][][][][][][] Q;
-    private double[][][][][][][] nextQ;
+    private double[][][][][][] nextV;
+    private double[][][][][][] V;
     private int[][][][][][] P;
     
     boolean firstTime = true;
+    
+    private final double gamma;
     private final int iterations;
     
-    public QPong(int iterations) {
+    public QPong(double gamma, int iterations) {
+    	
+    	this.gamma = gamma;
         this.iterations = iterations;
     }
 		
@@ -29,33 +33,12 @@ public class QPong extends Agent {
             
             int playerRange = dimension.height-size+1;
 
-            Q = new double[actions.length][deltaY.length + 1][deltaX.length + 2][playerRange][playerRange][dimension.height][dimension.width];
+            V = new double[deltaY.length + 1][deltaX.length + 2][playerRange][playerRange][dimension.height][dimension.width];
             P = new int[deltaY.length + 1][deltaX.length + 2][playerRange][playerRange][dimension.height][dimension.width];
             
             for (int i = 1; i <= iterations; i++) {
                 System.err.println("qIteration: "+i);
                 learn();
-                System.gc();
-            }
-            
-            for (int playerY = 0; playerY < playerRange; playerY++) {
-                for (int opponentY = 0; opponentY < playerRange; opponentY++) {
-                    for (int ballY = 0; ballY < dimension.height; ballY++) {
-                        for (int ballX = 0; ballX < dimension.width; ballX++) {
-                            for (int dx : deltaX) {
-                                for (int dy : deltaY) {
-                                    double bestQ = Integer.MIN_VALUE;
-                                    for (int act : actions) {
-                                        if (bestQ < Q[act + 1][dy + 1][dx + 2][playerY][opponentY][ballY][ballX]) {
-                                            bestQ = Q[act + 1][dy + 1][dx + 2][playerY][opponentY][ballY][ballX];
-                                            P[dy + 1][dx + 2][playerY][opponentY][ballY][ballX] = act;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
 	}
@@ -64,26 +47,28 @@ public class QPong extends Agent {
         
         int playerRange = dimension.height-size+1;
         
-        nextQ = new double[actions.length][deltaY.length + 1][deltaX.length + 2][playerRange][playerRange][dimension.height][dimension.width];
+        nextV = new double[deltaY.length + 1][deltaX.length + 2][playerRange][playerRange][dimension.height][dimension.width];
         for (int playerY = 0; playerY < playerRange; playerY++) {
             for (int opponentY = 0; opponentY < playerRange; opponentY++) {
                 for (int ballY = 0; ballY < dimension.height; ballY++) {
                     for (int ballX = 0; ballX < dimension.width; ballX++) {
                         for (int dx : deltaX) {
                             for (int dy : deltaY) {
-                                updateQ(playerY, opponentY, ballY, ballX, dy, dx);
+                                calculateQ(playerY, opponentY, ballY, ballX, dy, dx);
                             }
                         }
                     }
                 }
             }
         }
-        Q = nextQ;
+        V = nextV;
         System.gc();
     }
 	
-	private void updateQ(int playerY, int opponentY, int ballY, int ballX, int dy, int dx) {
+	private void calculateQ(int playerY, int opponentY, int ballY, int ballX, int dy, int dx) {
         
+		double bestQ = Long.MIN_VALUE;
+		
         int nextBallX = moveBallX(ballX, dx);
         int nextBallY = moveBallY(ballY, dy);
         int nextDx = updateDeltaX(playerY, opponentY, ballY, ballX, dx);
@@ -94,49 +79,38 @@ public class QPong extends Agent {
             int nextOpponentY = opponentY;
             int r = qReward(playerY, opponentY, ballY, ballX, dy, dx,
                             nextPlayerY, nextOpponentY, nextBallY, nextBallX, nextDy, nextDx);
-            double v = Integer.MIN_VALUE;
-            for (int sact : actions) {
-                if (v < Q[sact + 1][nextDy + 1][nextDx + 2][nextPlayerY][nextOpponentY][nextBallY][nextBallX]) {
-                    v = Q[sact + 1][nextDy + 1][nextDx + 2][nextPlayerY][nextOpponentY][nextBallY][nextBallX];
-                }
+            double v = V[nextDy + 1][nextDx + 2][nextPlayerY][nextOpponentY][nextBallY][nextBallX];
+            if (bestQ < r + gamma * v) {
+            	bestQ = r + gamma * v;
+            	P[dy + 1][dx + 2][playerY][opponentY][ballY][ballX] = act;
             }
-            nextQ[act + 1][dy + 1][dx + 2][playerY][opponentY][ballY][ballX] = r + 0.5*v;
         }
+        nextV[dy + 1][dx + 2][playerY][opponentY][ballY][ballX] = bestQ;
     }
 	
 	private int qReward(int playerY, int opponentY, int ballY, int ballX, int dy, int dx,
                         int nextPlayerY, int nextOpponentY, int nextBallY, int nextBallX,int nextDy, int nextDx) {
 
-        int nextReward = 0;
+        int reward = 0;
             // ball coming
         if (nextDx < 0) {
             if (nextBallX == 0) {
-                nextReward = -1000;
+                reward = -1000;
             }
             else if (nextBallX == 1 && nextBallY >= nextPlayerY && nextBallY < nextPlayerY+size) {
-                nextReward = 1000;
+                reward = 1000;
             }
         }
             // ball going away
         else {
             if (nextBallX == dimension.width-1) {
-                nextReward = 1000;
+                reward = 1000;
             }
-            else if (nextBallX == dimension.width-2 && nextBallY >= opponentY && nextBallY < opponentY+size) {
-                nextReward = -1000;
+            else if (nextBallX == dimension.width-2 && nextBallY >= nextOpponentY && nextBallY < nextOpponentY+size) {
+                reward = -1000;
             }
         }
-        return nextReward;
-            // approximated distance
-        /*int dist = playerY-ballY;
-        if (ballY > playerY+size) {
-            dist = ballY-(playerY+size);
-        }
-        int nextDist = nextPlayerY-nextBallY;
-        if (nextBallY > nextPlayerY+size) {
-            nextDist = nextBallY-(nextPlayerY+size);
-        }
-        return dist-nextDist;*/
+        return reward;
     }
     
     private int movePlayer(int y, int dy) {

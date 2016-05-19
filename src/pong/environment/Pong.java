@@ -10,7 +10,7 @@ public class Pong {
 	public static final int PLAYER = 0;
 	public static final int OPPONENT = 1;
 	
-	private final int[] deltaX = {-1, 1};
+	private final int[] deltaX = {-2, -1};
     private final int[] deltaY = {-1, 1};
 	
 	public Dimension dimension;
@@ -40,7 +40,7 @@ public class Pong {
         players[PLAYER].init();
 		players[OPPONENT].init();
         
-		ball = new Ball(new Coordinate(dimension.width-2, utils.rand(dimension.height)), new Coordinate(deltaX[utils.rand(1)], deltaY[utils.rand(2)]));
+		ball = new Ball(new Coordinate(dimension.width-2, utils.rand(dimension.height)), new Coordinate(deltaX[utils.rand(2)], deltaY[utils.rand(2)]));
 		ball.location.y = utils.rand(dimension.height);
 		int size = players[PLAYER].getSize();
 		status[PLAYER] = new Coordinate(0, (dimension.height - size) / 2);
@@ -73,7 +73,7 @@ public class Pong {
         		&& ball.location.y >= status[PLAYER].y 
         		&& ball.location.y < status[PLAYER].y+players[PLAYER].getSize()) {
         	
-        	/*int sectionLength = players[PLAYER].getSize()/3;
+        	int sectionLength = players[PLAYER].getSize()/3;
             
             if (ball.location.y < status[PLAYER].y+sectionLength) {
                 dx = 1;
@@ -83,15 +83,15 @@ public class Pong {
             }
             else {
                 dx = 1;
-            }*/
+            }
         	ballX = 1;
-        	ball.direction.x = -dx;
+        	ball.direction.x = dx;
         }
         else if (ballX > dimension.width-2
         		&& ball.location.y >= status[OPPONENT].y 
         		&& ball.location.y < status[OPPONENT].y+players[OPPONENT].getSize()) {
         	
-        	/*int sectionLength = players[OPPONENT].getSize()/3;
+        	int sectionLength = players[OPPONENT].getSize()/3;
             
             if (ball.location.y < status[OPPONENT].y+sectionLength) {
                 dx = -1;
@@ -101,9 +101,9 @@ public class Pong {
             }
             else {
                 dx = -1;
-            }*/
+            }
             ballX = dimension.width-2;
-        	ball.direction.x = -dx;
+        	ball.direction.x = dx;
         }
         return ballX;
     }

@@ -32,7 +32,7 @@ public class MainFrame extends JFrame implements Runnable {
 			else
 				pong.update();
 			try {
-				Thread.sleep(50);
+				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				continue;
 			}
