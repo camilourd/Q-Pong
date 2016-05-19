@@ -1,27 +1,23 @@
 package pong.gui;
 
-import java.awt.Dimension;
-
 import javax.swing.JFrame;
 
 import pong.environment.Pong;
 
 public class MainFrame extends JFrame implements Runnable {
 
-	private static final long serialVersionUID = -2471338664392279677L;
+	private static final long serialVersionUID = -4760789909255896958L;
 	
-	private Canvas canvas;
-	private Pong pong;
+	private final Canvas canvas;
+	private final Pong pong;
 	
 	public MainFrame(Pong pong) {
-		setSize(new Dimension(715, 485));
+        this.pong = pong;
 		canvas = new Canvas(pong);
-		this.add(canvas);
-		this.pong = pong;
+		super.add(canvas);
 	}
 	
 	public void play() {
-		
 		Thread t = new Thread(this);
 		t.setPriority(Thread.MAX_PRIORITY);
 		t.start();
@@ -36,7 +32,7 @@ public class MainFrame extends JFrame implements Runnable {
 			else
 				pong.update();
 			try {
-				Thread.sleep(80);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				continue;
 			}
@@ -47,5 +43,4 @@ public class MainFrame extends JFrame implements Runnable {
 	public void draw() {
 		canvas.repaint();
 	}
-
 }

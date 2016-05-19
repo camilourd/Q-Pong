@@ -17,7 +17,9 @@ public class Canvas extends JPanel {
 		drawer = new Drawer(pong, 700, 600);
 	}
 	
-	public void paint(Graphics g){
+    @Override
+	public void paint(Graphics g) {
+        
 	    super.paint(g);
 	    if(drawer != null)
 	        drawer.paint(g);

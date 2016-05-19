@@ -10,8 +10,8 @@ public class Pong {
 	public static final int PLAYER = 0;
 	public static final int OPPONENT = 1;
 	
-	public static final int[] deltaX = {-2, -1, 1, 2};
-    public static final int[] deltaY = {-1, 1};
+	private final int[] deltaX = {-1, 1};
+    private final int[] deltaY = {-1, 1};
 	
 	public Dimension dimension;
 	public Agent[] players = new Agent[2];
@@ -19,36 +19,45 @@ public class Pong {
 	public Ball ball;
 	
 	public Pong(Dimension dimension, Agent player, Agent opponent) {
+        
 		player.setSize(dimension.height / 5);
+        player.setStatus(PLAYER);
+        player.setBound(dimension);
+        
 		opponent.setSize(dimension.height / 5);
-		player.setStatus(PLAYER);
 		opponent.setStatus(OPPONENT);
-		player.setBound(dimension);
 		opponent.setBound(dimension);
+        
 		this.dimension = dimension;
 		this.players[PLAYER] = player;
 		this.players[OPPONENT] = opponent;
-		init();
+        
+        init();
 	}
 	
-	public void init() {
-		players[PLAYER].init();
+	public final void init() {
+        
+        players[PLAYER].init();
 		players[OPPONENT].init();
-		ball = new Ball(dimension.center(), new Coordinate(deltaX[utils.rand(4)], deltaY[utils.rand(2)]));
+        
+		ball = new Ball(new Coordinate(dimension.width-2, utils.rand(dimension.height)), new Coordinate(deltaX[utils.rand(1)], deltaY[utils.rand(2)]));
 		ball.location.y = utils.rand(dimension.height);
 		int size = players[PLAYER].getSize();
 		status[PLAYER] = new Coordinate(0, (dimension.height - size) / 2);
-		status[OPPONENT] = new Coordinate(dimension.width, (dimension.height - size) / 2);
+		status[OPPONENT] = new Coordinate(dimension.width-1, (dimension.height - size) / 2);
 	}
 
 	public Percept sense() {
-		return new Percept(status[PLAYER].y, status[OPPONENT].x, ball);
+		return new Percept(status[PLAYER].y, status[OPPONENT].y, ball);
 	}
 	
 	public void update() {
-		moveAgent(OPPONENT, players[OPPONENT].compute(sense()));
-		moveAgent(PLAYER, players[PLAYER].compute(sense()));
-		moveBall();
+        
+        moveBall();
+        if (isPlaying()) {
+            moveAgent(OPPONENT, players[OPPONENT].compute(sense()));
+            moveAgent(PLAYER, players[PLAYER].compute(sense()));
+        }
 	}
 
 	public void moveBall() {
@@ -59,41 +68,42 @@ public class Pong {
 	private int moveBallX(int ballX, int dx) {
 		
         ballX += dx;
-        if (ballX == 0 
+        
+        if (ballX < 1
         		&& ball.location.y >= status[PLAYER].y 
-        		&& ball.location.y < status[PLAYER].y+players[PLAYER].getSize()-1) {
+        		&& ball.location.y < status[PLAYER].y+players[PLAYER].getSize()) {
         	
-        	int sectionLength = players[PLAYER].getSize()/3;
+        	/*int sectionLength = players[PLAYER].getSize()/3;
             
             if (ball.location.y < status[PLAYER].y+sectionLength) {
-                dx = 2;
-            }
-            else if (ball.location.y < status[PLAYER].y+2*sectionLength) {
                 dx = 1;
             }
-            else {
+            else if (ball.location.y < status[PLAYER].y+2*sectionLength) {
                 dx = 2;
             }
+            else {
+                dx = 1;
+            }*/
         	ballX = 1;
-        	ball.direction.x = dx;
+        	ball.direction.x = -dx;
         }
-        else if (ballX == dimension.width-1 
+        else if (ballX > dimension.width-2
         		&& ball.location.y >= status[OPPONENT].y 
         		&& ball.location.y < status[OPPONENT].y+players[OPPONENT].getSize()) {
         	
-        	int sectionLength = players[OPPONENT].getSize()/3;
+        	/*int sectionLength = players[OPPONENT].getSize()/3;
             
             if (ball.location.y < status[OPPONENT].y+sectionLength) {
-                dx = -2;
-            }
-            else if (ball.location.y < status[OPPONENT].y+2*sectionLength) {
                 dx = -1;
             }
-            else {
+            else if (ball.location.y < status[OPPONENT].y+2*sectionLength) {
                 dx = -2;
             }
+            else {
+                dx = -1;
+            }*/
             ballX = dimension.width-2;
-        	ball.direction.x = dx;
+        	ball.direction.x = -dx;
         }
         return ballX;
     }
@@ -113,10 +123,11 @@ public class Pong {
     }
 	
 	public int getWinner() {
-		return (ball.location.x < 0)? OPPONENT : (ball.location.x >= dimension.width)? PLAYER : -1;
+		return (ball.location.x < 0)? OPPONENT : ((ball.location.x > dimension.width-2) ? PLAYER : -1);
 	}
 
 	public void moveAgent(int player, int dy) {
+        
 		int y = status[player].y + dy;
 		if(isValidPosition(player, y))
 			status[player].y = y;

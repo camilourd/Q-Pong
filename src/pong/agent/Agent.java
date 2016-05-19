@@ -4,9 +4,11 @@ import pong.environment.Dimension;
 
 public abstract class Agent {
 	
-	protected int size = 0;
-	protected int status = 0;
-	protected Dimension dimension = null;
+	protected int size;
+    
+	protected int status;
+    
+	protected Dimension dimension;
 	
 	public abstract int compute(Percept percept);
 	public abstract void init();

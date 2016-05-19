@@ -17,7 +17,7 @@ public class Dimension {
 	}
 	
 	public boolean isInside(Coordinate coord) {
-		return (coord.x >= 0 && coord.x < width) && (coord.y >= 0 && coord.y < height);
+		return (coord.x > 0 && coord.x < width-1) && (coord.y >= 0 && coord.y < height);
 	}
 
 }
