@@ -31,10 +31,10 @@ public class QPong extends Agent {
         if (firstTime) {
             firstTime = false;
             
-            int playerRange = dimension.height-size+1;
+            int playerRange = fieldSize.height-size+1;
 
-            V = new double[deltaY.length + 1][deltaX.length + 2][playerRange][playerRange][dimension.height][dimension.width];
-            P = new int[deltaY.length + 1][deltaX.length + 2][playerRange][playerRange][dimension.height][dimension.width];
+            V = new double[deltaY.length + 1][deltaX.length + 2][playerRange][playerRange][fieldSize.height][fieldSize.width];
+            P = new int[deltaY.length + 1][deltaX.length + 2][playerRange][playerRange][fieldSize.height][fieldSize.width];
             
             for (int i = 1; i <= iterations; i++) {
                 System.err.println("qIteration: "+i);
@@ -45,13 +45,13 @@ public class QPong extends Agent {
 	
 	public void learn() {
         
-        int playerRange = dimension.height-size+1;
+        int playerRange = fieldSize.height-size+1;
         
-        nextV = new double[deltaY.length + 1][deltaX.length + 2][playerRange][playerRange][dimension.height][dimension.width];
+        nextV = new double[deltaY.length + 1][deltaX.length + 2][playerRange][playerRange][fieldSize.height][fieldSize.width];
         for (int playerY = 0; playerY < playerRange; playerY++) {
             for (int opponentY = 0; opponentY < playerRange; opponentY++) {
-                for (int ballY = 0; ballY < dimension.height; ballY++) {
-                    for (int ballX = 0; ballX < dimension.width; ballX++) {
+                for (int ballY = 0; ballY < fieldSize.height; ballY++) {
+                    for (int ballX = 0; ballX < fieldSize.width; ballX++) {
                         for (int dx : deltaX) {
                             for (int dy : deltaY) {
                                 calculateQ(playerY, opponentY, ballY, ballX, dy, dx);
@@ -103,10 +103,10 @@ public class QPong extends Agent {
         }
             // ball going away
         else {
-            if (nextBallX == dimension.width-1) {
+            if (nextBallX == fieldSize.width-1) {
                 reward = 1000;
             }
-            else if (nextBallX == dimension.width-2 && nextBallY >= nextOpponentY && nextBallY < nextOpponentY+size) {
+            else if (nextBallX == fieldSize.width-2 && nextBallY >= nextOpponentY && nextBallY < nextOpponentY+size) {
                 reward = -1000;
             }
         }
@@ -119,8 +119,8 @@ public class QPong extends Agent {
         if (y < 0) {
             y = 0;
         }
-        else if (y > dimension.height-size) {
-            y = dimension.height-size;
+        else if (y > fieldSize.height-size) {
+            y = fieldSize.height-size;
         }
         return y;
     }
@@ -129,15 +129,15 @@ public class QPong extends Agent {
         
         ballX += dx;
         if (ballX < 0) ballX = 0;
-        if (ballX >= dimension.width) {
-            ballX = dimension.width-1;
+        if (ballX >= fieldSize.width) {
+            ballX = fieldSize.width-1;
         }
         return ballX;
     }
     
     private int moveBallY(int ballY, int dy) {
         
-        if (ballY == 0 && dy < 0 || ballY == dimension.height-1 && dy > 0) {
+        if (ballY == 0 && dy < 0 || ballY == fieldSize.height-1 && dy > 0) {
             dy = -dy;
         }
         ballY += dy;
@@ -146,7 +146,7 @@ public class QPong extends Agent {
 
     private int updateDeltaY(int ballY, int dy) {
         
-        if (ballY == 0 && dy < 0 || ballY == dimension.height-1 && dy > 0) {
+        if (ballY == 0 && dy < 0 || ballY == fieldSize.height-1 && dy > 0) {
             return -dy;
         }
         return dy;
@@ -157,7 +157,7 @@ public class QPong extends Agent {
         if (dx < 0 && ballX == 1 && ballY >= playerY && ballY < playerY+size) {
             return -dx;
         }
-        else if (dx > 0 && ballX == dimension.width-2 && ballY >= opponentY && ballY < opponentY+size) {
+        else if (dx > 0 && ballX == fieldSize.width-2 && ballY >= opponentY && ballY < opponentY+size) {
             return -dx;
         }
         return dx;
@@ -167,17 +167,17 @@ public class QPong extends Agent {
 	public int compute(Percept percept) {
         
 		int ballDeltaX = percept.ball.direction.x;
-		int ballX = percept.ball.location.x;
-        int ballY = percept.ball.location.y;
+		int ballX = percept.ball.position.x;
+        int ballY = percept.ball.position.y;
 		int ballDeltaY = percept.ball.direction.y;
-		int playerY = percept.player;
-        int opponentY = percept.opponent;
+		int playerY = percept.left;
+        int opponentY = percept.right;
 
-		if (status == Pong.OPPONENT) {
+		if (side == Pong.RIGHT) {
             ballDeltaX *= -1;
-            ballX = dimension.width-ballX-1;
+            ballX = fieldSize.width-ballX-1;
             int tmp = playerY;
-            playerY = percept.opponent;
+            playerY = percept.right;
             opponentY = tmp;
         }
         return P[ballDeltaY + 1][ballDeltaX + 2][playerY][opponentY][ballY][ballX];

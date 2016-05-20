@@ -8,13 +8,11 @@ import javax.swing.JPanel;
 import pong.environment.Pong;
 
 public class Canvas extends JPanel {
-
-	private static final long serialVersionUID = 8083254851294821748L;
+ 
+	private Drawer drawer;
 	
-	protected Drawer drawer;
-	
-	public Canvas(Pong pong) {
-		drawer = new Drawer(pong, 700, 600);
+	public Canvas(Pong pong, int scale) {
+		drawer = new Drawer(pong, scale);
 	}
 	
     @Override
@@ -27,7 +25,7 @@ public class Canvas extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(700, 600);
+		return new Dimension((drawer.pong.fieldSize.width+2)*drawer.scale, (drawer.pong.fieldSize.height+2)*drawer.scale);
 	}
 
 }

@@ -9,51 +9,46 @@ import pong.environment.Pong;
 
 public class Drawer {
 	
-	private final Pong pong;
+	protected final Pong pong;
 	
-	public int CELL_SIZE;
-
-	public int width, height;
+	protected int scale;
 	
-	public final float dashV[] = {10.0f};
+	private final float dashV[] = {10.0f};
     
-	public final BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, 
+	private final BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, 
                                                       BasicStroke.JOIN_MITER, 10.0f, dashV, 0.0f);
 	
-	public Drawer(Pong pong, int width, int height) {
+	public Drawer(Pong pong, int scale) {
         
 		this.pong = pong;
-		this.width = width;
-		this.height = height;
-        
-		CELL_SIZE = Math.min(width / (pong.dimension.width + 2), height / (pong.dimension.height + 2));
+		this.scale = scale;
 	}
 
 	public void paint(Graphics g) {
         
 		Graphics2D graph = (Graphics2D) g;
         
-		Dimension bound = pong.dimension;
+		Dimension bound = pong.fieldSize;
         
 		graph.setColor(Color.BLACK);
-		graph.fillRect(0, 0, (bound.width + 2) * CELL_SIZE, (bound.height + 2) * CELL_SIZE);
+		graph.fillRect(0, 0, (bound.width + 2) * scale, (bound.height + 2) * scale);
         
 		graph.setColor(Color.white);
-		graph.fillRect(CELL_SIZE, 0, bound.width * CELL_SIZE, CELL_SIZE);
-		graph.fillRect(CELL_SIZE, (bound.height + 1) * CELL_SIZE, bound.width * CELL_SIZE, CELL_SIZE);
+		graph.fillRect(scale, 0, bound.width * scale, scale);
+		graph.fillRect(scale, (bound.height + 1) * scale, bound.width * scale, scale);
         
-		if(bound.isInside(pong.ball.location)) {
+		if(bound.isInside(pong.ball.position)) {
             graph.setColor(Color.BLUE);
-			graph.fillRect((pong.ball.location.x + 1) * CELL_SIZE, (pong.ball.location.y + 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+			graph.fillRect((pong.ball.position.x + 1) * scale, (pong.ball.position.y + 1) * scale, scale, scale);
         }
         
         graph.setColor(Color.WHITE);
-		int size = pong.players[Pong.PLAYER].getSize();
-		graph.fillRect(CELL_SIZE, (pong.status[Pong.PLAYER].y + 1) * CELL_SIZE, CELL_SIZE, size * CELL_SIZE);
-		graph.fillRect(bound.width * CELL_SIZE, (pong.status[Pong.OPPONENT].y + 1) * CELL_SIZE, CELL_SIZE, size * CELL_SIZE);
+		int size = pong.agents[Pong.LEFT].getSize();
+		graph.fillRect(scale, (pong.agentPosition[Pong.LEFT].y + 1) * scale, scale, size * scale);
+		graph.fillRect(bound.width * scale, (pong.agentPosition[Pong.RIGHT].y + 1) * scale, scale, size * scale);
         
 		graph.setStroke(dashed);
-		graph.drawLine((bound.width + 2) / 2 * CELL_SIZE, 0, (bound.width + 2) / 2 * CELL_SIZE, (bound.height + 2) * CELL_SIZE);
+		graph.drawLine((bound.width + 2) / 2 * scale, 0, (bound.width + 2) / 2 * scale, (bound.height + 2) * scale);
         
 		graph.dispose();
 	}

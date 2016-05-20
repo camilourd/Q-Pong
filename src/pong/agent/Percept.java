@@ -4,14 +4,14 @@ import pong.environment.Ball;
 
 public class Percept {
 	
-	public int player;
-	public int opponent;
+	public int left;
+	public int right;
 	public Ball ball;
 	
-	public Percept(int player, int opponent, Ball ball) {
-		this.player = player;
-		this.opponent = opponent;
+	public Percept(int leftPosition, int rightPosition, Ball ball) {
+		
+		this.left = leftPosition;
+		this.right = rightPosition;
 		this.ball = ball;
 	}
-
 }
