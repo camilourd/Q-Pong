@@ -4,7 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import pong.environment.Dimension;
+import pong.environment.Bound;
 import pong.environment.Pong;
 
 public class Drawer {
@@ -28,7 +28,7 @@ public class Drawer {
         
 		Graphics2D graph = (Graphics2D) g;
         
-		Dimension bound = pong.fieldSize;
+		Bound bound = pong.fieldSize;
         
 		graph.setColor(Color.BLACK);
 		graph.fillRect(0, 0, (bound.width + 2) * scale, (bound.height + 2) * scale);

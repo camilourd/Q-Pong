@@ -2,12 +2,12 @@ package pong.environment;
 
 import pong.types.Coordinate;
 
-public class Dimension {
+public class Bound {
 	
 	public int width;
 	public int height;
 	
-	public Dimension(int width, int height) {
+	public Bound(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}
@@ -17,7 +17,7 @@ public class Dimension {
 	}
 	
 	public boolean isInside(Coordinate coord) {
-		return (coord.x >= 0 && coord.x <= width-1) && (coord.y >= 0 && coord.y < height);
+		return (coord.x >= 0 && coord.x < width) && (coord.y >= 0 && coord.y < height);
 	}
 
 }

@@ -13,12 +13,12 @@ public class Pong {
 	private final int[] deltaX = {-2, -1};
     private final int[] deltaY = {-1, 1};
 	
-	public Dimension fieldSize;
+	public Bound fieldSize;
 	public Agent[] agents = new Agent[2];
 	public Coordinate[] agentPosition = new Coordinate[2];
 	public Ball ball;
 	
-	public Pong(Dimension fieldSize, Agent leftSide, Agent rightSide) {
+	public Pong(Bound fieldSize, Agent leftSide, Agent rightSide) {
         
 		leftSide.setSize(fieldSize.height / 5);
         leftSide.setSide(LEFT);
@@ -54,7 +54,7 @@ public class Pong {
 		return new Percept(agentPosition[LEFT].y, agentPosition[RIGHT].y, ball);
 	}
 
-	public void moveAgent(int player) {
+	public synchronized void moveAgent(int player) {
         
 		int dy = agents[player].compute(sense());
 		int y = agentPosition[player].y + dy;
@@ -73,7 +73,6 @@ public class Pong {
 	
 	
 	private int moveBallX(int ballX, int dx) {
-		
         ballX += dx;
         
         if (ballX < 1

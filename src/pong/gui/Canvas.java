@@ -9,6 +9,8 @@ import pong.environment.Pong;
 
 public class Canvas extends JPanel {
  
+	private static final long serialVersionUID = 6665053824579884888L;
+	
 	private Drawer drawer;
 	
 	public Canvas(Pong pong, int scale) {

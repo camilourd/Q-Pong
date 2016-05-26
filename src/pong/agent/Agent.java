@@ -1,12 +1,12 @@
 package pong.agent;
 
-import pong.environment.Dimension;
+import pong.environment.Bound;
 
 public abstract class Agent {
 	
 	protected int size;
 	protected int side;
-	protected Dimension fieldSize;
+	protected Bound fieldSize;
 	
 	public void setSize(int size) {
 		this.size = size;
@@ -20,7 +20,7 @@ public abstract class Agent {
 		this.side = side;
 	}
 
-	public void setFieldSize(Dimension size) {
+	public void setFieldSize(Bound size) {
 		this.fieldSize = size;
 	}
 	

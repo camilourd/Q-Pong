@@ -26,10 +26,10 @@ public class KeyboardAgent extends Agent implements KeyListener {
 	public void keyPressed(KeyEvent k) {
 		
 		if (side == Pong.LEFT) {
-			if (k.getKeyCode() == KeyEvent.VK_W) {
+			if (k.getKeyCode() == KeyEvent.VK_A) {
 				direction = -1;
 			}
-			else if (k.getKeyCode() == KeyEvent.VK_S) {
+			else if (k.getKeyCode() == KeyEvent.VK_Z) {
 				direction = 1;
 			}
 		}
